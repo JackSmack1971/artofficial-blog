@@ -1,3 +1,31 @@
+# Development Environment Setup (Enhanced)
+
+This repository includes an enhanced development setup aligned to architecture decisions in [`docs/architecture-decisions.json`](docs/architecture-decisions.json). It targets performance, scalability to 25k+ subscribers, and quality gates from day one.
+
+Key capabilities:
+- Performance-first dev config (Lighthouse CI, bundle analyzer toggle)
+- Business metrics foundation (GA4 + Plausible env wiring)
+- QA integration (90%+ coverage target, lint/type checks)
+- Security scanning (npm audit, depcheck)
+- CMS integration validation for Ghost
+
+Quick start:
+1) Review and copy [`example.env`](example.env) to `.env.local`, fill in required values noted in ADR `env_config.required`.
+2) Run the installer:
+   - Linux/macOS: `bash ./install.sh`
+   - Windows (PowerShell): Use WSL bash or run steps manually (install Node 18+, pnpm or npm, then toolchain listed in install.sh).
+3) Commands:
+   - Lint: `npm run lint`
+   - Type check: `npm run type-check`
+   - Tests (with coverage): `npm test`
+   - Security: `security-audit`
+   - Performance: `perf-test`
+
+Targets (from ADRs):
+- Lighthouse Performance ≥ 95 per PR
+- LCP p95 ≤ 2.0s, FCP p95 ≤ 1.5s, TTI p95 ≤ 3.0s
+- Test coverage ≥ 90%
+- GDPR baseline, double opt-in flows (newsletter)
 # ARTOfficial Intelligence Academy
 
 > **Transform AI information overload into actionable intelligence**

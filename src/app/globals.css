@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens and base layer for consistent typography and spacing */
+:root {
+  --container-max: 1280px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1, "calt" 1;
+}
+
+body {
+  @apply antialiased text-neutral-800 bg-white dark:bg-neutral-950 dark:text-neutral-100;
+}
+
+.prose {
+  @apply max-w-[75ch];
+}
