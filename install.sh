@@ -18,11 +18,26 @@ git config --global init.defaultBranch main
 git config --global core.autocrlf false
 git config --global core.filemode false
 
-# Install and configure pnpm (preferred package manager)
+# Install and configure pnpm
 npm install -g pnpm@latest
+
+# Setup pnpm global directory
+pnpm setup || {
+    echo "Setting up pnpm manually..."
+    export PNPM_HOME="/usr/local/pnpm"
+    mkdir -p $PNPM_HOME
+    export PATH="$PNPM_HOME:$PATH"
+    echo 'export PNPM_HOME="/usr/local/pnpm"' >> ~/.bashrc
+    echo 'export PATH="$PNPM_HOME:$PATH"' >> ~/.bashrc
+    pnpm config set global-bin-dir $PNPM_HOME
+}
+
+# Reload environment
+source ~/.bashrc 2>/dev/null || true
+
+# Configure pnpm
 pnpm config set store-dir /tmp/.pnpm-store
 pnpm config set cache-dir /tmp/.pnpm-cache
-pnpm config set state-dir /tmp/.pnpm-state
 
 # Install global development tools
 pnpm add -g \
