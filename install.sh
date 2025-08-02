@@ -50,6 +50,14 @@ pnpm add -g \
     @lhci/cli@latest \
     npm-check-updates@latest \
     depcheck@latest
+    
+# Check if pnpm is properly configured
+pnpm config get global-bin-dir
+pnpm config get store-dir
+
+# Test global package installation
+pnpm add -g cowsay
+cowsay "pnpm is working!"
 
 # Install Python tools for testing and performance monitoring
 pip3 install --upgrade pip
