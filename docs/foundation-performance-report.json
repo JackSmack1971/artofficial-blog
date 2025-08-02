@@ -1,0 +1,104 @@
+{
+  "summary": {
+    "objective": "Business-Optimized Foundation with performance-first authority",
+    "status": "baseline-established",
+    "date": "2025-08-02T17:11:52.000Z",
+    "environment": "Next.js App Router, TypeScript strict, Tailwind, Vercel-ready"
+  },
+  "lighthouseTargets": {
+    "performance": 95,
+    "accessibility": 95,
+    "bestPractices": 95,
+    "seo": 95
+  },
+  "performanceArchitecture": {
+    "appRouter": true,
+    "edgeCaching": "configured in next.config.mjs (headers, caching policies)",
+    "codeSplitting": "App Router route-based chunking",
+    "imageOptimization": "Next/Image recommended",
+    "thirdPartyLoading": {
+      "ga4": "lazyOnload",
+      "plausible": "lazyOnload",
+      "biBus": "afterInteractive",
+      "noscriptFallback": true
+    },
+    "webVitals": [
+      "LCP",
+      "CLS"
+    ],
+    "hydrationOptimizations": [
+      "defer analytics",
+      "inline lightweight BI event bus"
+    ]
+  },
+  "businessMetricsFoundation": {
+    "events": [
+      "page_view",
+      "signup_start",
+      "signup_submit",
+      "ab_variant",
+      "perf_vitals",
+      "app_error"
+    ],
+    "fanout": [
+      "Google Analytics 4 (gtag)",
+      "Plausible"
+    ],
+    "queueing": "window.__bi with in-memory queue and subscriber fan-out",
+    "vitals": "PerformanceObserver for LCP/CLS baseline capture"
+  },
+  "conversionFoundation": {
+    "landingPage": "Hero with newsletter form, A/B variant scaffolding (A: email only, B: optional role)",
+    "uxPrinciples": [
+      "minimal script on critical path",
+      "accessible form and labels",
+      "clear value proposition",
+      "trust messaging (GDPR note)"
+    ],
+    "abTesting": "sticky variant via localStorage"
+  },
+  "scalabilityArchitecture": {
+    "components": {
+      "planned": [
+        "UI/Button",
+        "UI/Input",
+        "UI/Card"
+      ],
+      "newsletter": "NewsletterSignup component to abstract form and analytics"
+    },
+    "stateManagement": "Lightweight client state for forms; server actions/API for newsletter",
+    "apiPatterns": "Route handlers under src/app/api with validation and error handling"
+  },
+  "ghostIntegrationReadiness": {
+    "primary": "Ghost CMS and native newsletter",
+    "fallback": "ConvertKit API",
+    "env": [
+      "GHOST_API_URL",
+      "GHOST_CONTENT_API_KEY",
+      "GHOST_ADMIN_API_KEY",
+      "CONVERTKIT_API_KEY"
+    ],
+    "spec": "Integrate content fetch via @tryghost/content-api with circuit breaker and ISR"
+  },
+  "configurationChecklist": {
+    "envVariables": {
+      "NEXT_PUBLIC_GA_ID": "required for GA4",
+      "NEXT_PUBLIC_PLAUSIBLE_DOMAIN": "required for Plausible"
+    },
+    "securityHeaders": "Configured in next.config.mjs to include modern security headers",
+    "tailwind": "Typography, forms, aspect-ratio plugins enabled"
+  },
+  "validation": {
+    "performanceBaseline": "Meets lazy/deferred third-party script loading and vitals capture",
+    "metricsSupport": "Core business events available via window.__bi and TypeScript facade at src/lib/analytics/bi.ts",
+    "scalability": "Component and API patterns documented; UI primitives to be added",
+    "conversionOptimized": "Landing hero ready with analytics and A/B scaffolding"
+  },
+  "nextActions": [
+    "Add UI primitives (Button, Input, Card) under src/components/ui/",
+    "Implement NewsletterSignup component with API route integration",
+    "Create /api/newsletter route (Ghost native or ConvertKit fallback) with validation",
+    "Wire server actions or route handler to persist subscribers",
+    "Author documentation: component-architecture.md, metrics-integration.md, ghost-integration.md"
+  ]
+}

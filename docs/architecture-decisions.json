@@ -1,0 +1,138 @@
+{
+  "project": "ARTOfficial Intelligence Academy",
+  "version": "1.0",
+  "generated_at": "2025-08-02T16:46:45Z",
+  "decision_style": "Architecture Decision Records (ADRs) - structured JSON",
+  "business_objectives": {
+    "subscribers_target": 25000,
+    "open_rate_target_percent": 35,
+    "monthly_visitors_target": 100000,
+    "page_load_sla_seconds_p95": 2.0
+  },
+  "quality_attributes": {
+    "performance": { "global_fcp_seconds_p95": 1.5, "lcp_seconds_p95": 2.0, "tti_seconds_p95": 3.0 },
+    "scalability": { "monthly_users": 100000, "traffic_spike_factor": 10 },
+    "reliability": { "uptime_percent": 99.9 },
+    "security": { "gdpr_compliant": true, "encryption_in_transit": "TLS1.3", "encryption_at_rest": "AES-256" },
+    "accessibility": { "wcag_level": "2.1 AA", "lighthouse_accessibility_min": 95 }
+  },
+  "principles": [
+    "Performance First",
+    "Scalability by Design",
+    "Content-Centric",
+    "Integration-Ready (API-first)",
+    "Security & Compliance by Default",
+    "Developer Experience and Speed"
+  ],
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "title": "Adopt Next.js 15 (App Router) with TypeScript and Tailwind",
+      "status": "accepted",
+      "context": "Need SEO-first, SSG/ISR-aware framework with excellent DX to hit <2s global loads and quality gates.",
+      "decision": "Use Next.js 15 with App Router, TypeScript strict mode, Tailwind for styling.",
+      "consequences": [
+        "Fast global performance with SSG/ISR on Vercel CDN",
+        "Clear file-based routing and layouts",
+        "Strict typing improves maintainability and quality"
+      ],
+      "alternatives": ["Astro + React islands", "Remix"],
+      "rationale": "Best alignment with SEO, performance, tooling, and Vercel platform."
+    },
+    {
+      "id": "ADR-002",
+      "title": "Use Ghost Pro as headless CMS and native newsletter (ConvertKit fallback)",
+      "status": "accepted",
+      "context": "Need reliable CMS + newsletter with low ops burden and future paid memberships.",
+      "decision": "Primary: Ghost Pro (content + newsletter). Fallback: ConvertKit via abstraction layer.",
+      "consequences": [
+        "Reduced integration complexity",
+        "Native paid subscription path (Phase 2+)",
+        "Operational simplicity and reliability"
+      ],
+      "alternatives": ["Contentful + custom newsletter", "Sanity + ConvertKit"],
+      "rationale": "Ghost covers most needs, supports growth and monetization."
+    },
+    {
+      "id": "ADR-003",
+      "title": "Host on Vercel with Edge CDN",
+      "status": "accepted",
+      "context": "Global audience, need sub-2s loads and serverless scalability.",
+      "decision": "Deploy on Vercel; leverage ISR and global edge network.",
+      "consequences": [
+        "Preview deployments, automatic scaling",
+        "Edge caching and image optimization",
+        "Vendor alignment with Next.js"
+      ],
+      "rationale": "Best fit for Next.js, speed, and DX."
+    },
+    {
+      "id": "ADR-004",
+      "title": "Caching and Revalidation Strategy",
+      "status": "accepted",
+      "context": "Balance freshness with global performance.",
+      "decision": "Static assets: 1y immutable; ISR pages: s-maxage=300, stale-while-revalidate=86400; API: s-maxage=60, stale-while-revalidate=300.",
+      "consequences": ["Fast loads, graceful content updates", "Predictable cache behavior"],
+      "rationale": "Meets performance targets while enabling updates."
+    },
+    {
+      "id": "ADR-005",
+      "title": "Analytics: GA4 + Plausible dual integration",
+      "status": "accepted",
+      "context": "Need granular analytics + privacy.",
+      "decision": "Implement GA4 with consent management; add Plausible for privacy-focused metrics.",
+      "consequences": ["Comprehensive insights", "GDPR alignment through consent"],
+      "rationale": "Balances business intelligence and compliance."
+    },
+    {
+      "id": "ADR-006",
+      "title": "Security & GDPR baseline",
+      "status": "accepted",
+      "context": "Subscriber data handling and compliance requirements.",
+      "decision": "Security headers, TLS1.3, RBAC, data minimization, double opt-in, export/delete endpoints, audit logs.",
+      "consequences": ["Reduced risk, compliance readiness"],
+      "rationale": "Meets security gates and legal obligations."
+    },
+    {
+      "id": "ADR-007",
+      "title": "Abstraction layers for external services",
+      "status": "accepted",
+      "context": "Future flexibility (newsletter provider changes, social APIs).",
+      "decision": "Introduce lib/newsletter and lib/ghost abstraction interfaces.",
+      "consequences": ["Low switching cost", "Testability and resilience"],
+      "rationale": "Supports evolution and vendor changes."
+    }
+  ],
+  "integration_points": [
+    "Ghost Content API v5",
+    "Ghost Admin API",
+    "Ghost Webhooks (ISR revalidation)",
+    "ConvertKit REST API (fallback)",
+    "Google Analytics 4 Web",
+    "Plausible Analytics",
+    "Twitter/X, LinkedIn share endpoints"
+  ],
+  "risks": [
+    { "id": "R-001", "risk": "SEO competition", "mitigation": "Long-tail strategy, thought leadership, newsletter-first." },
+    { "id": "R-002", "risk": "Content velocity bottleneck", "mitigation": "Guest author network, editorial buffers, repurposing." },
+    { "id": "R-003", "risk": "Vendor lock-in", "mitigation": "Abstraction layers, export tools." }
+  ],
+  "fitness_functions": [
+    { "name": "Lighthouse Performance", "threshold": 95, "frequency": "per PR" },
+    { "name": "Global LCP p95", "threshold_seconds": 2.0, "frequency": "weekly" },
+    { "name": "Newsletter open rate", "threshold_percent": 35, "frequency": "monthly" }
+  ],
+  "env_config": {
+    "required": [
+      "GHOST_API_URL",
+      "GHOST_CONTENT_API_KEY",
+      "GHOST_ADMIN_API_KEY",
+      "CONVERTKIT_API_KEY",
+      "NEXT_PUBLIC_GA_ID",
+      "NEXT_PUBLIC_PLAUSIBLE_DOMAIN",
+      "SENTRY_DSN",
+      "NEXTAUTH_SECRET",
+      "NEXTAUTH_URL"
+    ]
+  }
+}
