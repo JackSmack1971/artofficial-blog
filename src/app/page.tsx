@@ -1,4 +1,5 @@
 'use client'
+import * as React from 'react'
 
 /**
  * Conversion-optimized landing with A/B scaffolding and analytics events.
@@ -26,18 +27,60 @@ function pickVariant(): 'A' | 'B' {
 
 export default function HomePage() {
   const variant = pickVariant();
+  const [success, setSuccess] = React.useState(false);
 
   function onSignupStart() {
     track('signup_start', { surface: 'hero', variant });
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get('email') || '').trim();
+    const company = String(fd.get('company') || '').trim(); // honeypot
+    const source = 'homepage-hero';
+
     track('signup_submit', { surface: 'hero', variant, hasEmail: email.length > 0 });
-    // TODO: hook to /api/newsletter (Ghost/ConvertKit). For now, just reset.
-    e.currentTarget.reset();
+
+    if (email.length < 5) {
+      return;
+    }
+
+    // Generate a lightweight request id
+    const requestId = `ui_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Request-ID': requestId
+        },
+        body: JSON.stringify({
+          email,
+          source,
+          // keep tags/ref optional by default
+          doubleOptIn: true,
+          // honeypot field - sent as per API, humans leave it blank
+          company
+        })
+      });
+
+      const data = await res.json().catch(() => ({} as any));
+
+      if (res.ok) {
+        // 200 already subscribed, 201 pending/subscribed
+        track('signup_success', { surface: 'hero', variant, status: (data as any)?.status || 'success' });
+        e.currentTarget.reset();
+        setSuccess(true);
+      } else {
+        track('signup_error', { surface: 'hero', variant, code: (data as any)?.error || res.status });
+        setSuccess(false);
+      }
+    } catch {
+      track('signup_error', { surface: 'hero', variant, code: 'network_error' });
+      setSuccess(false);
+    }
   }
 
   return (
@@ -57,11 +100,14 @@ export default function HomePage() {
         {/* A/B: variant A uses single-field, variant B adds optional role select */}
         <div className="mt-8">
           <form
+            data-testid="newsletter-form"
             aria-label="Newsletter signup"
             onSubmit={onSubmit}
             className="mx-auto flex w-full max-w-xl flex-col gap-3 sm:flex-row"
+            role="form"
           >
             <input
+              data-testid="newsletter-email"
               type="email"
               name="email"
               inputMode="email"
@@ -87,14 +133,33 @@ export default function HomePage() {
               </select>
             )}
             <button
+              data-testid="newsletter-submit"
               type="submit"
               className="rounded-md bg-black px-5 py-3 font-semibold text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black"
               aria-label="Subscribe to newsletter"
             >
               Subscribe
             </button>
+            {/* Honeypot field: hidden visually, present in DOM */}
+            <input
+              type="text"
+              name="company"
+              tabIndex={-1}
+              aria-hidden="true"
+              autoComplete="off"
+              className="hidden"
+              defaultValue=""
+            />
           </form>
           <p className="mt-2 text-xs text-gray-500">GDPR-friendly. No spam. Unsubscribe anytime.</p>
+          {/* Success UI hook for E2E: becomes visible after a successful submission */}
+          <div
+            data-testid="newsletter-success"
+            aria-live="polite"
+            className={success ? 'mt-2 text-sm text-green-700' : 'sr-only'}
+          >
+            Thank you for subscribing!
+          </div>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">

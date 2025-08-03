@@ -7,8 +7,9 @@ type Level = 'debug' | 'info' | 'warn' | 'error'
 interface MetricEvent {
   name: string
   category: 'business' | 'performance' | 'diagnostic'
-  props?: Record<string, unknown>
-  ts?: number
+  // With exactOptionalPropertyTypes enabled, explicitly allow undefined
+  props?: Record<string, unknown> | undefined
+  ts?: number | undefined
 }
 
 const enabled = process.env.DEV_TELEMETRY_ENABLED === '1' || process.env.NODE_ENV === 'development'
@@ -33,13 +34,13 @@ function log(l: Level, ev: MetricEvent) {
 }
 
 export const DevMetrics = {
-  business(name: string, props?: Record<string, unknown>, l: Level = 'info') {
+  business(name: string, props?: Record<string, unknown> | undefined, l: Level = 'info') {
     log(l, { name, category: 'business', props })
   },
-  performance(name: string, props?: Record<string, unknown>, l: Level = 'info') {
+  performance(name: string, props?: Record<string, unknown> | undefined, l: Level = 'info') {
     log(l, { name, category: 'performance', props })
   },
-  diagnostic(name: string, props?: Record<string, unknown>, l: Level = 'debug') {
+  diagnostic(name: string, props?: Record<string, unknown> | undefined, l: Level = 'debug') {
     log(l, { name, category: 'diagnostic', props })
   }
 }
