@@ -1,7 +1,8 @@
 /** PostCSS config for TailwindCSS (ADR-001 performance-first) */
 export default {
   plugins: {
-    tailwindcss: {},
+    // Use the new PostCSS plugin package for Tailwind CSS v4+
+    '@tailwindcss/postcss': {},
     autoprefixer: {},
   },
 }
